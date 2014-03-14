@@ -34,7 +34,7 @@ namespace Walmart {
       public string ProductTrackingUrl;
       public double StandardShipRate;
       public bool MarketPlace;
-      public string ProductUtl;
+      public string ProductUrl;
       public string CategoryNode;
       public bool Bundle;
       public bool AvailableOnline;
