@@ -6,14 +6,18 @@ using System.Xml.Linq;
 
 namespace Walmart {
    public class WalmartSearchClient {
+      #region Fields
       private const string BaseUrl = "http://walmartlabs.api.mashery.com/v1/";
       private readonly string _apiKey;
+      #endregion
+      #region Constructor
       public WalmartSearchClient(string apiKey) {
          if (String.IsNullOrWhiteSpace(apiKey))
             throw new InvalidOperationException("apiKey is required");
          _apiKey = apiKey;
       }
-
+      #endregion
+      #region Api Calls
       public SearchResponse ItemSearch(SearchRequest request) {
          var response = new SearchResponse();
 
@@ -24,7 +28,7 @@ namespace Walmart {
          if (!String.IsNullOrWhiteSpace(request.LsPublisherId))
             urlBuilder.Append(String.Format("&lsPublisherId={0}", request.LsPublisherId));
          if (request.CategoryId != null)
-            urlBuilder.Append(String.Format("&categoryId={0}", request.CategoryId.Value.GetTypeCode()));
+            urlBuilder.Append(String.Format("&categoryId={0}", request.CategoryId.Value));
          if (request.Start != null)
             urlBuilder.Append(String.Format("&start={0}", request.Start));
          if (request.Sort != null) {
@@ -70,6 +74,24 @@ namespace Walmart {
          return response;
       }
 
+      public LookupResponse ItemLookup(LookupRequest request) {
+         var response = new LookupResponse();
+
+         var urlBuilder = new StringBuilder(String.Format("{0}items/{1}?apiKey={2}", BaseUrl, request.ItemId, _apiKey));
+         if (!String.IsNullOrWhiteSpace(request.LsPublisherId))
+            urlBuilder.Append(String.Format("&lsPublisherId={0}", request.LsPublisherId));
+         urlBuilder.Append("&format=xml");
+
+         var serverResponse = XDocument.Load(urlBuilder.ToString());
+
+         var item = (from result in serverResponse.Descendants("item")
+                     select result);
+
+         response.ResponseItem = CreateResponseItems(item).FirstOrDefault();
+         return response;
+      }
+      #endregion
+      #region Helpers
       private List<ResponseItem> CreateResponseItems(IEnumerable<XElement> items) {
          var responseItems = new List<ResponseItem>();
          foreach (var item in items) {
@@ -91,7 +113,7 @@ namespace Walmart {
             Double.TryParse(salePriceValue, out responseItem.SalePrice);
 
             responseItem.CategoryPath = (from result in item.Descendants("categoryPath")
-               select result.Value).FirstOrDefault();
+                                         select result.Value).FirstOrDefault();
 
             responseItem.ShortDescription = (from result in item.Descendants("shortDescription")
                                              select result.Value).FirstOrDefault();
@@ -131,5 +153,6 @@ namespace Walmart {
          }
          return responseItems;
       }
+      #endregion
    }
 }

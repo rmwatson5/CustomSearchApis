@@ -22,6 +22,15 @@ namespace Walmart {
       public IList<ResponseItem> ResponseItems;
    }
 
+   public struct LookupRequest {
+      public int ItemId;
+      public string LsPublisherId;
+   }
+
+   public struct LookupResponse {
+      public ResponseItem ResponseItem;
+   }
+
    public struct ResponseItem {
       public int ItemId;
       public int ParentItemId;
