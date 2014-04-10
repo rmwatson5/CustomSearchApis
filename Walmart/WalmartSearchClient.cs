@@ -28,7 +28,7 @@ namespace Walmart {
          if (!String.IsNullOrWhiteSpace(request.LsPublisherId))
             urlBuilder.Append(String.Format("&lsPublisherId={0}", request.LsPublisherId));
          if (request.CategoryId != null)
-            urlBuilder.Append(String.Format("&categoryId={0}", request.CategoryId.Value));
+            urlBuilder.Append(String.Format("&categoryId={0}", (int)request.CategoryId));
          if (request.Start != null)
             urlBuilder.Append(String.Format("&start={0}", request.Start));
          if (request.Sort != null) {
